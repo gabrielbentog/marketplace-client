@@ -18,6 +18,14 @@ export interface ApiListResponse<T> {
   meta: MetaPagination;
 }
 
+export interface AuthResponse {
+  data?: {
+    user: User;
+  };
+  user?: User;
+  message?: string;
+}
+
 // --- Entidades Base ---
 
 export type UserRole = 'buyer' | 'seller' | 'admin';

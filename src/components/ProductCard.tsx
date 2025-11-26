@@ -4,6 +4,7 @@ import { Product } from "@/types";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ShoppingCart } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -14,11 +15,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const mainImage = product.images?.[0]?.url || "https://placehold.co/600x400?text=Sem+Imagem";
   
   // Formatação de preço (BRL)
-  const formattedPrice = new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(Number(product.price));
-
+  const formattedPrice = formatPrice(product.price);
   const isOutOfStock = product.stock <= 0;
 
   return (

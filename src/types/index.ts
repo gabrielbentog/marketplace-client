@@ -7,6 +7,12 @@ export interface MetaPagination {
   total_count: number;
 }
 
+export interface DataWrapper<T> {
+  data: T;
+  meta?: MetaPagination;
+  message?: string;
+}
+
 export interface ApiResponse<T> {
   data: T;
   meta?: MetaPagination;

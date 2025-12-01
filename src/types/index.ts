@@ -129,3 +129,22 @@ export interface Order {
   payment_method?: string;
   address?: Address; // Endereço snapshot ou ID
 }
+
+export interface Address {
+  id: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string; // camelCase
+  country?: string;
+  addressType: 'shipping' | 'billing'; // camelCase
+}
+
+export interface Order {
+  id: string;
+  status: OrderStatus;
+  total: string;
+  paymentMethod: string;
+  createdAt: string;
+  items: any[];
+}

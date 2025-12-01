@@ -2,7 +2,6 @@
 
 import { ChangeEvent, useState } from "react";
 import { X, ImagePlus } from "lucide-react";
-import Image from "next/image";
 
 interface ImageUploadProps {
   onImagesSelected: (files: File[]) => void;
@@ -34,7 +33,8 @@ export function ImageUpload({ onImagesSelected }: ImageUploadProps) {
     <div className="grid grid-cols-3 gap-4 sm:grid-cols-4">
       {previews.map((src, index) => (
         <div key={index} className="relative aspect-square rounded-md overflow-hidden border border-gray-200 bg-gray-50 dark:border-zinc-700 dark:bg-zinc-800">
-          <Image src={src} alt="Preview" fill className="object-cover" />
+          <img src={src} alt="Preview" className="h-full w-full object-cover object-center" />
+
           <button
             type="button"
             onClick={() => removeImage(index)}

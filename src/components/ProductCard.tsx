@@ -1,11 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/types";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { ShoppingCart } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { ProductCardAction } from "./ProductCardAction";
+import { getImageUrl } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -13,7 +11,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   // Fallback seguro se não houver imagem
-  const mainImage = product.images?.[0]?.url || "https://placehold.co/600x400?text=Sem+Imagem";
+  const mainImage = getImageUrl(product.images?.[0]?.url);
 
   // Formatação de preço (BRL)
   const formattedPrice = formatPrice(product.price);
@@ -24,12 +22,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Imagem com Link */}
       <Link href={`/products/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-gray-100">
-        <Image
+        <img
           src={mainImage}
           alt={product.name}
-          fill
-          className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="w-full h-full object-cover object-center absolute inset-0"
         />
 
         {/* Badges de Status */}

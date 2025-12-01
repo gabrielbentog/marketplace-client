@@ -15,7 +15,7 @@ import { ImageUpload } from "@/components/ImageUpload";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2, X } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 
 // Schema (mesmo da criação)
 const productSchema = z.object({
@@ -166,10 +166,9 @@ export default function EditProductPage({ params }: EditProductPageProps) {
                   <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Imagens Atuais</span>
                   <div className="grid grid-cols-4 gap-4">
                     {product.images.map((img) => (
-                      <div key={img.id} className="relative aspect-square rounded-md overflow-hidden border border-gray-200 dark:border-zinc-700">
-                        <Image src={img.url} alt="Imagem atual" fill className="object-cover" />
-                        {/* Botão de deletar imagem individual requer endpoint específico */}
-                      </div>
+                    <div key={img.id} className="relative aspect-square rounded-md overflow-hidden border border-gray-200 dark:border-zinc-700">
+                        <img src={getImageUrl(img.url)} alt={product.name} className="h-full w-full object-cover object-center" />
+                    </div>
                     ))}
                   </div>
                 </div>

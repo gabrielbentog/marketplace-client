@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ProductService } from "@/services/products";
 import { Product } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getImageUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Edit, Trash2, Plus, PackageSearch, Loader2 } from "lucide-react";
@@ -143,13 +142,13 @@ export default function MyProductsPage() {
                 </thead>
                 <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
                   {products.map((product) => {
-                    const image = product.images?.[0]?.url || "https://placehold.co/100";
+                    const image = getImageUrl(product.images?.[0]?.url);
                     return (
                       <tr key={product.id} className="group hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10 relative rounded overflow-hidden border border-gray-200 dark:border-zinc-700">
-                              <Image src={image} alt="" fill className="object-cover" />
+                              <img src={image} alt={product.name} className="h-full w-full object-cover object-center" />
                             </div>
                             <div className="ml-4">
                               <div className="text-sm font-medium text-gray-900 dark:text-white max-w-[200px] truncate" title={product.name}>

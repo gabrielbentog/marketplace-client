@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/Button";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, getImageUrl } from "@/lib/utils";
 import { Trash2, Minus, Plus, ShoppingBag, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -49,13 +48,13 @@ export default function CartPage() {
                 // Proteção caso product venha nulo (embora seu JSON mostre que vem)
                 if (!product) return null;
 
-                const image = product.images?.[0]?.url || "https://placehold.co/150";
+                const image = getImageUrl(product.images?.[0]?.url);
 
                 return (
                   <li key={item.id} className="flex py-6 sm:py-10">
                     <div className="flex-shrink-0">
                       <div className="relative w-24 h-24 rounded-md overflow-hidden bg-gray-100">
-                        <Image src={image} alt={product.name} fill className="object-cover" />
+                        <img src={image} alt={product.name} className="h-full w-full object-cover object-center" />
                       </div>
                     </div>
 

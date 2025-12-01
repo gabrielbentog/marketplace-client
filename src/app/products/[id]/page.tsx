@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductService } from "@/services/products";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { ProductImageGallery } from "@/components/ProductImageGallery"; // <--- Importe aqui
 import { Badge } from "@/components/ui/Badge";
 import { ChevronLeft, Package, Store } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
@@ -20,28 +20,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
   try {
     // 2. Buscamos o produto no servidor (Server-Side Fetching)
     product = await ProductService.getById(id);
-    console.log("Produto carregado:", product);
   } catch (error) {
     console.error("Erro ao buscar produto:", error);
-    // Se der erro 404 ou outro, redirecionamos para a página de Not Found do Next
     notFound();
   }
 
   if (!product) return notFound();
 
-  // Fallback de imagem
-  const mainImage = product.images?.[0]?.url || "https://placehold.co/600x600?text=Sem+Imagem";
-  
   const formattedPrice = formatPrice(product.price);
 
   return (
     <div className="bg-gray-50 dark:bg-black min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Breadcrumb / Voltar */}
         <div className="mb-6">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
@@ -50,15 +45,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
 
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
-          {/* Coluna da Esquerda: Imagem */}
-          <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100 border border-gray-200 dark:border-zinc-800">
-            <Image
-              src={mainImage}
-              alt={product.name}
-              fill
-              className="object-cover object-center"
-              priority // Carrega com prioridade por ser a imagem principal (LCP)
-              sizes="(max-width: 768px) 100vw, 50vw"
+
+          {/* Coluna da Esquerda: Galeria Interativa */}
+          <div className="mb-8 lg:mb-0">
+            <ProductImageGallery
+              images={product.images}
+              productName={product.name}
             />
           </div>
 
@@ -93,11 +85,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <Package className="w-4 h-4 mr-2" />
                 <span>Estoque disponível: {product.stock} unidades</span>
               </div>
-              
-              {/* Placeholder para info do vendedor se tivermos essa info */}
+
               <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                 <Store className="w-4 h-4 mr-2" />
-                <span>Vendido por: {product.seller_id ? "Vendedor Verificado" : "Marketplace"}</span>
+                <span>Vendido por: {product.user?.name || product.seller_id || "Marketplace"}</span>
               </div>
             </div>
 

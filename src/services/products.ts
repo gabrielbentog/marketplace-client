@@ -1,28 +1,49 @@
 import { api } from "@/lib/api";
 import { Product, DataWrapper } from "@/types";
 
-// Tipagem dos filtros disponíveis na API
 interface ProductFilters {
   page?: number;
   per_page?: number;
   search?: string;
   category_id?: string;
-  sort?: string; // ex: 'price_asc', 'created_desc'
+  sort?: string;
+  seller_id?: string;
 }
 
 export const ProductService = {
   getAll: async (params?: ProductFilters): Promise<DataWrapper<Product[]>> => {
-      // Se a lista também vier dentro de 'data', o axios.get retorna { data: { data: [...] } }
-      // Então response.data já é o objeto DataWrapper
-      const response = await api.get<DataWrapper<Product[]>>("/api/products", {
-        params,
-      });
-      return response.data;
-    },
+    const response = await api.get<DataWrapper<Product[]>>("/api/products", {
+      params,
+    });
+    return response.data;
+  },
 
   getById: async (id: string): Promise<Product> => {
     const response = await api.get<DataWrapper<Product>>(`/api/products/${id}`);
-    
     return response.data.data;
   },
+
+  create: async (formData: FormData): Promise<Product> => {
+    const response = await api.post("/api/products", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    const data = response.data as any;
+    return data.data || data;
+  },
+
+  update: async (id: string, formData: FormData): Promise<Product> => {
+    const response = await api.patch(`/api/products/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    const data = response.data as any;
+    return data.data || data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/api/products/${id}`);
+  }
 };

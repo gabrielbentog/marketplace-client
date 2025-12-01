@@ -58,18 +58,26 @@ export interface ProductImage {
 
 export type ProductStatus = 'active' | 'inactive';
 
+export interface ProductUser {
+  id: string;
+  name: string | null;
+  email: string;
+}
+
 // Baseado em api_products.json
 export interface Product {
   id: string;
   name: string;
   description: string;
-  price: string; // Decimal como string
+  price: string;
   stock: number;
   status: ProductStatus;
-  images?: ProductImage[]; // Ajustado para o objeto de imagem real
-  category_ids?: string[];
-  seller_id?: string;
-  created_at: string;
+  createdAt: string;
+  updatedAt: string;
+  images?: ProductImage[];
+  categories?: Category[];
+  user?: ProductUser;
+  seller_id?: string; // Mantemos opcional por compatibilidade caso alguma rota antiga use
 }
 
 // Baseado em api_addresses.json

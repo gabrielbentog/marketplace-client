@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useCart } from "@/contexts/CartContext"; // <--- Importação nova
-import { ShoppingCart, User, LogOut, Package, PlusCircle, Menu, X } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+import { ShoppingCart, User, LogOut, Package, PlusCircle, Menu, X, ShoppingBag } from "lucide-react";
 import { Button } from "./ui/Button";
 
 export function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
-  const { itemCount } = useCart(); // <--- Pegando o valor real do contexto
+  const { itemCount } = useCart();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -28,6 +28,11 @@ export function Navbar() {
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <NavLink href="/products">Explorar Produtos</NavLink>
+
+              {/* Se quiser dar muito destaque, pode colocar aqui também,
+                  mas o padrão é no dropdown do usuário */}
+              {/* <NavLink href="/orders">Meus Pedidos</NavLink> */}
+
               {user?.role === 'seller' && (
                 <NavLink href="/my-products">Meus Anúncios</NavLink>
               )}
@@ -45,11 +50,9 @@ export function Navbar() {
               </Link>
             )}
 
-            {/* Ícone do Carrinho com Contador Real */}
+            {/* Ícone do Carrinho */}
             <Link href="/cart" className="relative p-2 text-gray-600 hover:text-blue-600 dark:text-gray-300 transition-colors">
               <ShoppingCart className="w-6 h-6" />
-
-              {/* Só mostra a bolinha se tiver itens */}
               {itemCount > 0 && (
                 <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full min-w-[20px]">
                   {itemCount}
@@ -73,7 +76,7 @@ export function Navbar() {
 
                 {isUserMenuOpen && (
                   <div
-                    className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-zinc-800 dark:ring-zinc-700"
+                    className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-zinc-800 dark:ring-zinc-700"
                     onMouseLeave={() => setIsUserMenuOpen(false)}
                   >
                     <div className="px-4 py-2 border-b border-gray-100 dark:border-zinc-700">
@@ -81,28 +84,39 @@ export function Navbar() {
                       <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
                     </div>
 
-                    <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-zinc-700">
-                      <div className="flex items-center">
-                        <User className="w-4 h-4 mr-2" /> Perfil
-                      </div>
-                    </Link>
-
-                    {user?.role === 'seller' && (
-                      <Link href="/my-products" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-zinc-700">
+                    <div className="py-1">
+                      <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-zinc-700">
                         <div className="flex items-center">
-                          <Package className="w-4 h-4 mr-2" /> Produtos
+                          <User className="w-4 h-4 mr-2 text-gray-400" /> Meu Perfil
                         </div>
                       </Link>
-                    )}
 
-                    <button
-                      onClick={logout}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-zinc-700"
-                    >
-                      <div className="flex items-center">
-                        <LogOut className="w-4 h-4 mr-2" /> Sair
-                      </div>
-                    </button>
+                      {/* Link ADICIONADO: Meus Pedidos */}
+                      <Link href="/orders" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-zinc-700">
+                        <div className="flex items-center">
+                          <ShoppingBag className="w-4 h-4 mr-2 text-gray-400" /> Meus Pedidos
+                        </div>
+                      </Link>
+
+                      {user?.role === 'seller' && (
+                        <Link href="/my-products" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-zinc-700">
+                          <div className="flex items-center">
+                            <Package className="w-4 h-4 mr-2 text-gray-400" /> Gerenciar Anúncios
+                          </div>
+                        </Link>
+                      )}
+                    </div>
+
+                    <div className="border-t border-gray-100 dark:border-zinc-700 py-1">
+                      <button
+                        onClick={logout}
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-zinc-700"
+                      >
+                        <div className="flex items-center">
+                          <LogOut className="w-4 h-4 mr-2" /> Sair
+                        </div>
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -132,7 +146,7 @@ export function Navbar() {
 
       {/* Menu Mobile Expandido */}
       {isMobileMenuOpen && (
-        <div className="sm:hidden bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800">
+        <div className="sm:hidden bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 shadow-lg">
           <div className="pt-2 pb-3 space-y-1">
             <MobileNavLink href="/products">Explorar Produtos</MobileNavLink>
             {user?.role === 'seller' && (
@@ -142,7 +156,7 @@ export function Navbar() {
 
           {isAuthenticated ? (
             <div className="pt-4 pb-4 border-t border-gray-200 dark:border-zinc-800">
-              <div className="flex items-center px-4">
+              <div className="flex items-center px-4 mb-3">
                 <div className="flex-shrink-0">
                   <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
                     {user?.name?.charAt(0).toUpperCase()}
@@ -153,11 +167,16 @@ export function Navbar() {
                   <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{user?.email}</div>
                 </div>
               </div>
-              <div className="mt-3 space-y-1">
+              <div className="space-y-1">
                 <MobileNavLink href="/cart">Carrinho ({itemCount})</MobileNavLink>
+                <MobileNavLink href="/orders">Meus Pedidos</MobileNavLink> {/* ADICIONADO */}
+                <MobileNavLink href="/profile">Meu Perfil</MobileNavLink>
+                {user?.role === 'seller' && (
+                  <MobileNavLink href="/my-products">Meus Anúncios</MobileNavLink>
+                )}
                 <button
                   onClick={logout}
-                  className="block w-full text-left px-4 py-2 text-base font-medium text-red-600 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                  className="block w-full text-left pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-red-600 hover:bg-gray-50 hover:text-red-800 dark:hover:bg-zinc-800"
                 >
                   Sair
                 </button>

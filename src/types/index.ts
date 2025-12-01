@@ -83,21 +83,30 @@ export interface Address {
   address_type: 'shipping' | 'billing';
 }
 
+export interface CartProductSnapshot {
+  id: string;
+  name: string;
+  price: string;
+  images: ProductImage[];
+}
+
 // Baseado em api_cart.json
 export interface CartItem {
   id: string;
-  product_id: string;
   quantity: number;
-  subtotal: string; // O backend já calcula pra nós!
-  product?: Product; 
+  subtotal: string;
+  createdAt: string;
+  updatedAt: string;
+  product: CartProductSnapshot; // Agora obrigatório pois o JSON mostra que vem
 }
 
 export interface Cart {
   id: string;
   total: string;
-  total_items: number;
-  cart_items: CartItem[];
-  updated_at: string;
+  totalItems: number; // JSON: "totalItems": 2
+  cartItems: CartItem[]; // JSON: "cartItems": [...]
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Baseado em api_orders.json

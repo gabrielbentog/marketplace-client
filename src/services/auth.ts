@@ -22,7 +22,7 @@ interface AuthResponse {
     user?: User;
   };
   // Index signature permite acessar outras propriedades se a resposta for o próprio User
-  [key: string]: unknown; 
+  [key: string]: unknown;
 }
 
 export const AuthService = {
@@ -33,7 +33,7 @@ export const AuthService = {
     });
 
     const authHeader = response.headers['authorization'];
-    
+
     if (authHeader) {
       setAuthToken(authHeader);
     } else {
@@ -49,7 +49,7 @@ export const AuthService = {
     if (typeof window !== "undefined") {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
     }
-    
+
     return user;
   },
 
@@ -59,13 +59,13 @@ export const AuthService = {
     });
 
     const authHeader = response.headers['authorization'];
-    
+
     if (authHeader) {
       setAuthToken(authHeader);
     }
 
     const data = response.data;
-    
+
     // Mesma lógica de extração aqui
     const user = data.user || data.data?.user || (data as unknown as User);
 
@@ -89,18 +89,29 @@ export const AuthService = {
 
     // Verifica se o Cookie de autenticação ainda existe
     const token = Cookies.get(AUTH_COOKIE_NAME);
-    
+
     if (!token) {
-      return null; 
+      return null;
     }
 
     const userStr = localStorage.getItem(STORAGE_KEY);
     if (!userStr) return null;
-    
+
     try {
       return JSON.parse(userStr) as User;
     } catch {
       return null;
     }
-  }
+  },
+
+  updateProfile: async (id: string, data: { name?: string; email?: string; password?: string }) => {
+    const response = await api.patch(`/api/users/${id}`, { user: data });
+
+    // Atualiza o cookie/storage com os novos dados se for o próprio usuário
+    const updatedUser = response.data.data || response.data; // Ajuste conforme retorno
+    if (typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+    }
+    return updatedUser;
+  },
 };

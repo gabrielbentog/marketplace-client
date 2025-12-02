@@ -1,4 +1,4 @@
-"use client"; // <--- MUDANÇA CRUCIAL
+"use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/Badge";
 import { ArrowLeft, MapPin, CreditCard, Loader2 } from "lucide-react";
 import { Order } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -46,8 +47,31 @@ export default function OrderDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-black">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <Skeleton className="h-5 w-32 mb-6" /> {/* Voltar */}
+
+          <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-sm">
+            <div className="p-6 border-b border-gray-200 dark:border-zinc-800">
+               <Skeleton className="h-8 w-64 mb-2" />
+               <Skeleton className="h-4 w-48" />
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-10">
+               <div className="md:col-span-2 space-y-4">
+                  <Skeleton className="h-5 w-32" />
+                  {[1, 2].map(i => <Skeleton key={i} className="h-16 w-full" />)}
+               </div>
+               <div>
+                  <Skeleton className="h-5 w-32 mb-3" />
+                  <Skeleton className="h-24 w-full rounded-md" />
+               </div>
+               <div>
+                  <Skeleton className="h-5 w-32 mb-3" />
+                  <Skeleton className="h-24 w-full rounded-md" />
+               </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

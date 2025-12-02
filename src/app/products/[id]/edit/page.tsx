@@ -47,16 +47,16 @@ export default function EditProductPage({ params }: EditProductPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
-    const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm({
+    const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: zodResolver(productSchema)
     });
 
   // 1. Proteção de Rota
   useEffect(() => {
-    if (authLoading) return;
-    if (!isAuthenticated) router.push("/login");
-    else if (user?.role !== "seller") router.push("/");
-  }, [isAuthenticated, user, router, authLoading]);
+    if (!authLoading && user && user.role !== "seller") {
+      router.push("/"); // Proteção de Role continua no cliente por enquanto
+    }
+  }, [user, authLoading, router]);
 
   // 2. Carregar Dados Iniciais (Categorias + Produto)
   useEffect(() => {

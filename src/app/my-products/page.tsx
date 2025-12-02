@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Edit, Trash2, Plus, PackageSearch, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function MyProductsPage() {
   // 1. Pegamos o isLoading do contexto e renomeamos para authLoading
@@ -23,15 +24,10 @@ export default function MyProductsPage() {
 
   // 2. Proteção de Rota Ajustada
   useEffect(() => {
-    // Se o AuthContext ainda está carregando os cookies, não fazemos nada (esperamos)
-    if (authLoading) return;
-
-    if (!isAuthenticated) {
-      router.push("/login");
-    } else if (user?.role !== "seller") {
-      router.push("/");
+    if (!authLoading && user && user.role !== "seller") {
+      router.push("/"); // Proteção de Role continua no cliente por enquanto
     }
-  }, [isAuthenticated, user, router, authLoading]); // Adicione authLoading nas dependências
+  }, [user, authLoading, router]);
 
   // Carregar Produtos
   useEffect(() => {
@@ -42,9 +38,7 @@ export default function MyProductsPage() {
           per_page: 50,
         });
 
-        let myItems = response.data || [];
-
-        setProducts(myItems);
+        setProducts(response.data || []);
       } catch (error) {
         console.error("Erro ao carregar produtos", error);
         toast.error("Não foi possível carregar seus produtos.");
@@ -62,8 +56,34 @@ export default function MyProductsPage() {
   // 3. Loading State Global (Auth ou Produtos)
   if (authLoading || (isAuthenticated && user?.role === "seller" && isProductsLoading)) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-black">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-8">
+             <div className="space-y-2">
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-4 w-64" />
+             </div>
+             <Skeleton className="h-10 w-40" />
+          </div>
+
+          <div className="bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-800 overflow-hidden">
+            <div className="p-4 border-b border-gray-200 dark:border-zinc-800 flex gap-4">
+              {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-4 w-1/4" />)}
+            </div>
+            <div className="divide-y divide-gray-200 dark:divide-zinc-800">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="p-4 flex items-center gap-4">
+                   <Skeleton className="h-12 w-12 rounded" />
+                   <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-1/2" />
+                      <Skeleton className="h-3 w-1/3" />
+                   </div>
+                   <Skeleton className="h-8 w-20" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

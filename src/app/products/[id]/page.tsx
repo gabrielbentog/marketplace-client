@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductService } from "@/services/products";
@@ -7,9 +8,31 @@ import { Badge } from "@/components/ui/Badge";
 import { ChevronLeft, Package, Store } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
-// Tipagem correta para Next.js 15+
 interface ProductPageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { id } = await params;
+
+  try {
+    const product = await ProductService.getById(id);
+
+    return {
+      title: product.name,
+      description: product.description || `Compre ${product.name} com o melhor preço no MarketPlace.`,
+      openGraph: {
+        title: product.name,
+        description: product.description,
+        images: product.images?.[0]?.url ? [product.images[0].url] : [],
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Produto não encontrado",
+      description: "Este produto pode ter sido removido ou não existe.",
+    };
+  }
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {

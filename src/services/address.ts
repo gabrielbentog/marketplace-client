@@ -24,5 +24,9 @@ export const AddressService = {
     });
 
     return response.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/api/addresses/${id}`);
   }
 };

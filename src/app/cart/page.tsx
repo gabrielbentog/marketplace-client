@@ -4,18 +4,57 @@ import Link from "next/link";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/Button";
 import { formatPrice, getImageUrl } from "@/lib/utils";
-import { Trash2, Minus, Plus, ShoppingBag, ArrowRight } from "lucide-react";
+import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function CartPage() {
-  const { cart, isLoading, removeFromCart, updateQuantity, cartTotal } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { cart, removeFromCart, updateQuantity, cartTotal, isLoading: cartLoading } = useCart();
 
+  if (authLoading || cartLoading) {
+    return (
+      <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Skeleton className="h-10 w-48 mb-8" />
+          <div className="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start xl:gap-x-16">
+            <section className="lg:col-span-7">
+               <div className="space-y-6">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex py-6 border-b border-gray-200 dark:border-zinc-800">
+                      <Skeleton className="h-24 w-24 rounded-md" />
+                      <div className="ml-4 flex-1 space-y-2">
+                        <Skeleton className="h-5 w-1/2" />
+                        <Skeleton className="h-4 w-1/4" />
+                      </div>
+                    </div>
+                  ))}
+               </div>
+            </section>
+            <section className="lg:col-span-5 mt-16 lg:mt-0">
+               <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg border border-gray-200 dark:border-zinc-800 space-y-4">
+                 <Skeleton className="h-6 w-1/3" />
+                 <Skeleton className="h-4 w-full" />
+                 <Skeleton className="h-12 w-full rounded-md mt-4" />
+               </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. VERIFICAÇÃO DE AUTH:
+  // Agora só entra aqui se authLoading for false.
   if (!isAuthenticated) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-        <h2 className="text-2xl font-bold">Faça login para ver seu carrinho</h2>
-        <Link href="/login" className="mt-4"><Button>Entrar</Button></Link>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 bg-gray-50 dark:bg-black">
+        <ShoppingBag className="w-16 h-16 text-gray-300 mb-4" />
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Faça login para ver seu carrinho</h2>
+        <p className="text-gray-500 mb-6 mt-2">Você precisa estar conectado para gerenciar suas compras.</p>
+        <Link href="/login">
+          <Button>Entrar na minha conta</Button>
+        </Link>
       </div>
     );
   }

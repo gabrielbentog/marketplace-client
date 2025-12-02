@@ -1,4 +1,4 @@
-"use client"; // <--- MUDANÇA CRUCIAL
+"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -6,10 +6,11 @@ import { OrderService } from "@/services/orders";
 import { formatPrice } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Package, Calendar, ChevronRight, Loader2 } from "lucide-react";
+import { Package, Calendar, ChevronRight } from "lucide-react";
 import { Order } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -53,10 +54,31 @@ export default function MyOrdersPage() {
     cancelled: "error",
   };
 
-  if (isLoading) {
+if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-black">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <Skeleton className="h-10 w-48 mb-8" />
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                   <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Skeleton className="h-6 w-32" />
+                        <Skeleton className="h-5 w-20 rounded-full" />
+                      </div>
+                      <div className="flex gap-4">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                   </div>
+                   <Skeleton className="h-9 w-24 rounded-md" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

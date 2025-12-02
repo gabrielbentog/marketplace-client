@@ -6,9 +6,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { ShoppingCart, User, LogOut, Package, PlusCircle, Menu, X, ShoppingBag } from "lucide-react";
 import { Button } from "./ui/Button";
+import { Skeleton } from "@/components/ui/Skeleton"; // <--- Importe o Skeleton
 
 export function Navbar() {
-  const { user, logout, isAuthenticated } = useAuth();
+  // 1. Pegamos o isLoading da autenticação
+  const { user, logout, isAuthenticated, isLoading: authLoading } = useAuth();
   const { itemCount } = useCart();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -29,11 +31,8 @@ export function Navbar() {
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <NavLink href="/products">Explorar Produtos</NavLink>
 
-              {/* Se quiser dar muito destaque, pode colocar aqui também,
-                  mas o padrão é no dropdown do usuário */}
-              {/* <NavLink href="/orders">Meus Pedidos</NavLink> */}
-
-              {user?.role === 'seller' && (
+              {/* Verifica se é seller e se já carregou */}
+              {!authLoading && user?.role === 'seller' && (
                 <NavLink href="/my-products">Meus Anúncios</NavLink>
               )}
             </div>
@@ -41,7 +40,10 @@ export function Navbar() {
 
           {/* Lado Direito: Ações */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
-            {user?.role === 'seller' && (
+            {/* Botão Vender (Skeleton ou Botão) */}
+            {authLoading ? (
+              <Skeleton className="h-9 w-24 hidden md:block" />
+            ) : user?.role === 'seller' && (
               <Link href="/products/new">
                 <Button variant="outline" size="sm" className="hidden md:flex">
                   <PlusCircle className="w-4 h-4 mr-2" />
@@ -60,8 +62,14 @@ export function Navbar() {
               )}
             </Link>
 
-            {/* Menu do Usuário */}
-            {isAuthenticated ? (
+            {/* Menu do Usuário ou Login (AQUI ESTAVA O PROBLEMA) */}
+            {authLoading ? (
+              // Estado de Carregamento: Mostra um círculo cinza no lugar do avatar
+              <div className="ml-3">
+                 <Skeleton className="h-8 w-8 rounded-full" />
+              </div>
+            ) : isAuthenticated ? (
+              // Estado Logado
               <div className="relative ml-3">
                 <div>
                   <button
@@ -91,7 +99,6 @@ export function Navbar() {
                         </div>
                       </Link>
 
-                      {/* Link ADICIONADO: Meus Pedidos */}
                       <Link href="/orders" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-zinc-700">
                         <div className="flex items-center">
                           <ShoppingBag className="w-4 h-4 mr-2 text-gray-400" /> Meus Pedidos
@@ -121,6 +128,7 @@ export function Navbar() {
                 )}
               </div>
             ) : (
+              // Estado Deslogado
               <div className="flex space-x-2">
                 <Link href="/login">
                   <Button variant="ghost" size="sm">Entrar</Button>
@@ -149,12 +157,28 @@ export function Navbar() {
         <div className="sm:hidden bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 shadow-lg">
           <div className="pt-2 pb-3 space-y-1">
             <MobileNavLink href="/products">Explorar Produtos</MobileNavLink>
-            {user?.role === 'seller' && (
+            {/* Skeleton ou Link no mobile */}
+            {authLoading ? (
+               <div className="px-4 py-2"><Skeleton className="h-5 w-32" /></div>
+            ) : user?.role === 'seller' ? (
                <MobileNavLink href="/products/new">Vender Produto</MobileNavLink>
-            )}
+            ) : null}
           </div>
 
-          {isAuthenticated ? (
+          {/* Lógica de Loading também no Mobile */}
+          {authLoading ? (
+            <div className="pt-4 pb-4 border-t border-gray-200 dark:border-zinc-800 px-4 space-y-3">
+               <div className="flex items-center">
+                  <Skeleton className="h-10 w-10 rounded-full mr-3" />
+                  <div className="space-y-2">
+                     <Skeleton className="h-4 w-32" />
+                     <Skeleton className="h-3 w-40" />
+                  </div>
+               </div>
+               <Skeleton className="h-4 w-full" />
+               <Skeleton className="h-4 w-full" />
+            </div>
+          ) : isAuthenticated ? (
             <div className="pt-4 pb-4 border-t border-gray-200 dark:border-zinc-800">
               <div className="flex items-center px-4 mb-3">
                 <div className="flex-shrink-0">
@@ -169,7 +193,7 @@ export function Navbar() {
               </div>
               <div className="space-y-1">
                 <MobileNavLink href="/cart">Carrinho ({itemCount})</MobileNavLink>
-                <MobileNavLink href="/orders">Meus Pedidos</MobileNavLink> {/* ADICIONADO */}
+                <MobileNavLink href="/orders">Meus Pedidos</MobileNavLink>
                 <MobileNavLink href="/profile">Meu Perfil</MobileNavLink>
                 {user?.role === 'seller' && (
                   <MobileNavLink href="/my-products">Meus Anúncios</MobileNavLink>

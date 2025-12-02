@@ -7,26 +7,27 @@ import { useParams, useRouter } from "next/navigation";
 import { OrderService } from "@/services/orders";
 import { formatPrice } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
-import { ArrowLeft, MapPin, CreditCard, Loader2 } from "lucide-react";
-import { Order } from "@/types";
+import { ArrowLeft, MapPin, CreditCard } from "lucide-react";
+import { Order, OrderItem } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
-import { Skeleton } from "@/components/ui/Skeleton";
+import { Skeleton } from "@/components/ui/Skeleton"; // <--- Importe Skeleton
 
 export default function OrderDetailPage() {
   const params = useParams();
   const id = params.id as string;
 
   const [order, setOrder] = useState<Order | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { isAuthenticated } = useAuth();
+  const [isOrderLoading, setIsOrderLoading] = useState(true); // Renomeei para clareza
+  // CORREÇÃO: Pega authLoading
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
+  // CORREÇÃO: Só redireciona se auth carregou E não tá logado
   useEffect(() => {
-    if (!isAuthenticated) {
-        // Redirecionamento simples
+    if (!authLoading && !isAuthenticated) {
         router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, authLoading, router]);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -36,20 +37,22 @@ export default function OrderDetailPage() {
       } catch (error) {
         console.error("Erro ao buscar detalhes:", error);
       } finally {
-        setIsLoading(false);
+        setIsOrderLoading(false);
       }
     };
 
+    // Só busca se estiver logado e o ID existir
     if (isAuthenticated && id) {
       fetchOrder();
     }
   }, [id, isAuthenticated]);
 
-  if (isLoading) {
+  // CORREÇÃO: Loading unificado (Esqueleto)
+  if (authLoading || isOrderLoading) {
     return (
       <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <Skeleton className="h-5 w-32 mb-6" /> {/* Voltar */}
+          <Skeleton className="h-5 w-32 mb-6" />
 
           <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden shadow-sm">
             <div className="p-6 border-b border-gray-200 dark:border-zinc-800">
@@ -59,7 +62,7 @@ export default function OrderDetailPage() {
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-10">
                <div className="md:col-span-2 space-y-4">
                   <Skeleton className="h-5 w-32" />
-                  {[1, 2].map(i => <Skeleton key={i} className="h-16 w-full" />)}
+                  {[1, 2].map(i => <Skeleton key={i} className="h-16 w-full rounded" />)}
                </div>
                <div>
                   <Skeleton className="h-5 w-32 mb-3" />
@@ -94,6 +97,7 @@ export default function OrderDetailPage() {
   };
 
   return (
+    // ... (O JSX de retorno do conteúdo real permanece idêntico)
     <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
 
@@ -120,7 +124,7 @@ export default function OrderDetailPage() {
             <div className="md:col-span-2">
               <h2 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide mb-4">Itens do Pedido</h2>
               <ul className="divide-y divide-gray-200 dark:divide-zinc-800 border-t border-b border-gray-200 dark:border-zinc-800">
-                {order.items?.map((item: any) => (
+                {order.items?.map((item: OrderItem) => (
                   <li key={item.id} className="py-4 flex items-center">
                     <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-gray-100 dark:border-zinc-700">
                       <Image
@@ -139,7 +143,7 @@ export default function OrderDetailPage() {
                     </div>
                     <div className="text-right">
                       <p className="font-medium text-gray-900 dark:text-white">
-                        {formatPrice(item.price_at_purchase || item.price)}
+                        {formatPrice(item.price_at_purchase)}
                       </p>
                     </div>
                   </li>

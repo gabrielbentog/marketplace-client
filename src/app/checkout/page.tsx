@@ -12,36 +12,39 @@ import { AddressForm } from "@/components/AddressForm";
 import { MapPin, CreditCard, CheckCircle, Plus, Loader2 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function CheckoutPage() {
+  // ... (Todo o código anterior de hooks e useEffects mantém igual) ...
   const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { cart, cartTotal, clearCart, isLoading: isCartLoading } = useCart();
-  const { isAuthenticated } = useAuth();
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [isCreatingAddress, setIsCreatingAddress] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("credit_card");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(true);
 
-  // Redirecionamentos de segurança
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!authLoading && !isAuthenticated) {
       router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, authLoading, router]);
 
-  // Carrega endereços
   useEffect(() => {
     const loadAddresses = async () => {
       try {
         const data = await AddressService.getAll();
         setAddresses(data);
         if (data.length > 0) {
-          setSelectedAddressId(data[0].id);
+          setSelectedAddressId((prev) => prev || data[0].id);
         }
       } catch (error) {
         console.error("Erro ao buscar endereços", error);
+      } finally {
+        setIsLoadingAddresses(false);
       }
     };
 
@@ -60,9 +63,7 @@ export default function CheckoutPage() {
     try {
       await CheckoutService.processCheckout(selectedAddressId, paymentMethod);
       toast.success("Pedido realizado com sucesso!");
-
-      await clearCart(); // Limpa o carrinho local e remoto
-
+      await clearCart();
       router.push("/orders/success");
     } catch (error) {
       console.error(error);
@@ -72,16 +73,40 @@ export default function CheckoutPage() {
     }
   };
 
-  if (isCartLoading) {
+  if (authLoading || isCartLoading || (isAuthenticated && isLoadingAddresses)) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-black">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <Skeleton className="h-10 w-64 mb-8" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="md:col-span-2 space-y-8">
+              <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg border border-gray-200 dark:border-zinc-800">
+                 <Skeleton className="h-8 w-48 mb-4" />
+                 <Skeleton className="h-24 w-full rounded-md" />
+              </div>
+              <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg border border-gray-200 dark:border-zinc-800">
+                 <Skeleton className="h-8 w-48 mb-4" />
+                 <div className="grid grid-cols-3 gap-3">
+                    <Skeleton className="h-12 rounded-md" />
+                    <Skeleton className="h-12 rounded-md" />
+                    <Skeleton className="h-12 rounded-md" />
+                 </div>
+              </div>
+            </div>
+            <div className="md:col-span-1">
+               <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg border border-gray-200 dark:border-zinc-800">
+                  <Skeleton className="h-6 w-32 mb-6" />
+                  <Skeleton className="h-32 w-full mb-6" />
+                  <Skeleton className="h-12 w-full rounded-md" />
+               </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
-  // Se o carrinho estiver vazio (e não estiver carregando), manda voltar
-  if (cart?.cartItems?.length === 0) {
+  if (!cart || !cart.cartItems || cart.cartItems.length === 0) {
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 bg-gray-50 dark:bg-black">
             <h2 className="text-2xl font-bold mb-4 dark:text-white">Seu carrinho está vazio</h2>
@@ -97,7 +122,6 @@ export default function CheckoutPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-          {/* LADO ESQUERDO: Dados */}
           <div className="md:col-span-2 space-y-8">
 
             {/* Endereço */}
@@ -138,8 +162,9 @@ export default function CheckoutPage() {
                         }`}
                       >
                         <div className="flex items-start justify-between">
-                          <div>
-                            <p className="font-medium text-gray-900 dark:text-white">{addr.street}</p>
+                          {/* CORREÇÃO AQUI: Adicionado pr-8 para evitar overlap com o ícone */}
+                          <div className="pr-8">
+                            <p className="font-medium text-gray-900 dark:text-white break-words">{addr.street}</p>
                             <p className="text-sm text-gray-500">{addr.city} - {addr.state}, {addr.zipCode}</p>
                           </div>
                           {selectedAddressId === addr.id && (
@@ -153,7 +178,7 @@ export default function CheckoutPage() {
               )}
             </div>
 
-            {/* Pagamento */}
+            {/* Pagamento (mantém igual) */}
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800">
               <h2 className="text-xl font-semibold flex items-center gap-2 mb-4 dark:text-white">
                 <CreditCard className="text-blue-600" /> Forma de Pagamento
@@ -181,7 +206,7 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* LADO DIREITO: Resumo */}
+          {/* Resumo (mantém igual) */}
           <div className="md:col-span-1">
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800 sticky top-24">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Resumo do Pedido</h3>

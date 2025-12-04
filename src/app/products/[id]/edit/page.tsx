@@ -13,9 +13,10 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ImageUpload } from "@/components/ImageUpload";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, X } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { getImageUrl } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Schema (mesmo da criação)
 const productSchema = z.object({
@@ -37,7 +38,7 @@ interface EditProductPageProps {
 export default function EditProductPage({ params }: EditProductPageProps) {
   // Desembrulha params com hook use() (React 19/Next 15)
   const { id } = use(params);
-
+  const queryClient = useQueryClient();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -119,6 +120,8 @@ export default function EditProductPage({ params }: EditProductPageProps) {
       });
 
       await ProductService.update(id, formData);
+
+      await queryClient.invalidateQueries({ queryKey: ['my-products'] });
 
       toast.success("Produto atualizado com sucesso!");
       router.push("/my-products");

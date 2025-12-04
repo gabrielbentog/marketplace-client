@@ -79,6 +79,14 @@ export default function OrderDetailPage() {
     cancelled: "error",
   };
 
+  const orderStatusMap: Record<string, string> = {
+    pending: "Pendente",
+    paid: "Pago",
+    shipped: "Enviado",
+    completed: "Concluído",
+    cancelled: "Cancelado",
+  };
+
   return (
     // ... (O JSX de retorno do conteúdo real permanece idêntico)
     <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
@@ -94,7 +102,9 @@ export default function OrderDetailPage() {
             <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                 Pedido #{order.id.slice(0, 8)}
-                <Badge variant={statusVariant[order.status]}>{order.status}</Badge>
+                <Badge variant={statusVariant[order.status] || "default"}>
+                  {orderStatusMap[order.status] || order.status}
+                </Badge>
               </h1>
               <p className="text-sm text-gray-500 mt-1">
                 Realizado em {new Date(order.createdAt).toLocaleDateString("pt-BR")} às {new Date(order.createdAt).toLocaleTimeString("pt-BR")}

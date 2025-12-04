@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ProductService } from "@/services/products";
-import { Product } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatPrice, getImageUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -40,11 +38,16 @@ export default function MyProductsPage() {
     },
     onError: () => {
       toast.error("Erro ao excluir.");
+    },
+    onSettled: () => {
+      setIsDeleting(null);
     }
   });
 
   const handleDelete = async (id: string) => {
     if (!confirm("Tem certeza que deseja excluir este anúncio?")) return;
+
+    setIsDeleting(id);
     deleteMutation.mutate(id);
   };
   // 3. Loading State Global (Auth ou Produtos)
@@ -141,6 +144,17 @@ export default function MyProductsPage() {
                 <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-200 dark:divide-zinc-800">
                   {products.map((product) => {
                     const image = getImageUrl(product.images?.[0]?.url);
+                    const statusLabel: Record<string, string> = {
+                      active: "Ativo",
+                      inactive: "Inativo",
+                      archived: "Arquivado",
+                    };
+
+                    const statusColor: Record<string, "success" | "neutral" | "warning"> = {
+                      active: "success",
+                      inactive: "neutral",
+                      archived: "warning",
+                    };
                     return (
                       <tr key={product.id} className="group hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -169,8 +183,8 @@ export default function MyProductsPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <Badge variant={product.status === 'active' ? 'success' : 'neutral'}>
-                            {product.status === 'active' ? 'Ativo' : 'Inativo'}
+                          <Badge variant={statusColor[product.status] || "neutral"}>
+                            {statusLabel[product.status] || product.status}
                           </Badge>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

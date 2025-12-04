@@ -41,6 +41,14 @@ export default function MyOrdersPage() {
     cancelled: "error",
   };
 
+  const orderStatusMap: Record<string, string> = {
+    pending: "Pendente",
+    paid: "Pago",
+    shipped: "Enviado",
+    completed: "Concluído",
+    cancelled: "Cancelado",
+  };
+
   // 3. Loading State com Skeleton
   if (authLoading || isOrdersLoading) {
     return (
@@ -99,7 +107,7 @@ export default function MyOrdersPage() {
                         Pedido #{order.id.slice(0, 8)}
                       </h3>
                       <Badge variant={statusVariant[order.status] || "default"}>
-                        {order.status}
+                        {orderStatusMap[order.status] || order.status}
                       </Badge>
                     </div>
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 gap-4">

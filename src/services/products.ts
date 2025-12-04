@@ -8,6 +8,7 @@ interface ProductFilters {
   category_id?: string;
   sort?: string;
   seller_id?: string;
+  in_stock?: string;
 }
 
 export const ProductService = {

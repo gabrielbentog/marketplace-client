@@ -29,7 +29,7 @@ export const ProductService = {
         "Content-Type": "multipart/form-data",
       },
     });
-    const data = response.data as any;
+    const data = response.data as DataWrapper<Product>;
     return data.data || data;
   },
 
@@ -39,7 +39,7 @@ export const ProductService = {
         "Content-Type": "multipart/form-data",
       },
     });
-    const data = response.data as any;
+    const data = response.data as DataWrapper<Product>;
     return data.data || data;
   },
 

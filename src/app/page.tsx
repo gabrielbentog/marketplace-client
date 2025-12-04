@@ -1,28 +1,28 @@
+import Link from "next/link";
 import { ProductService } from "@/services/products";
 import { CategoryService } from "@/services/categories"; // <--- Importe o serviço
 import { ProductCard } from "@/components/ProductCard";
 import { PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/Button"; // <--- Importe Button
-import Link from "next/link"; // <--- Importe Link
-import { Product, Category } from "@/types"; // <--- Importe Category
+import { Product, Category } from "@/types";
 
 export default async function HomePage() {
   let products: Product[] = [];
-  let categories: Category[] = []; // <--- Estado das categorias
+  let categories: Category[] = [];
   let error: string | null = null;
 
   try {
-    // Busca paralela para ser mais rápido
-    const [productsData, categoriesData] = await Promise.all([
-      ProductService.getAll({ page: 1, per_page: 8 }), // Pegamos apenas 8 destaques
+    // Busca paralela: O tempo total será o da requisição mais lenta (não a soma das duas)
+    const [productsResponse, categoriesResponse] = await Promise.all([
+      ProductService.getAll({ page: 1, per_page: 8 }), // 8 destaques
       CategoryService.getAll()
     ]);
 
-    products = productsData.data || [];
-    categories = categoriesData || []; // Ajuste conforme o retorno do seu serviço
+    products = productsResponse.data || [];
+    categories = categoriesResponse || [];
   } catch (e) {
     console.error("Erro ao carregar dados:", e);
-    error = "Não foi possível carregar o conteúdo.";
+    error = "Não foi possível carregar o conteúdo no momento.";
   }
 
   return (
@@ -34,24 +34,24 @@ export default async function HomePage() {
             MarketPlace
           </h1>
           <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Encontre produtos incríveis com os melhores preços.
+            Encontre produtos incríveis com os melhores preços e entrega garantida.
           </p>
 
-          {/* Lista de Categorias (Pílulas) */}
+          {/* Lista de Categorias */}
           {categories.length > 0 && (
             <div className="mt-10 flex flex-wrap justify-center gap-2">
+              <Link href="/products">
+                 <Button variant="primary" size="sm" className="rounded-full">
+                   Tudo
+                 </Button>
+              </Link>
               {categories.map((cat) => (
                 <Link key={cat.id} href={`/products?category_id=${cat.id}`}>
-                  <Button variant="secondary" size="sm" className="rounded-full">
+                  <Button variant="outline" size="sm" className="rounded-full bg-transparent hover:bg-gray-100 hover:bg-zinc-800">
                     {cat.name}
                   </Button>
                 </Link>
               ))}
-              <Link href="/products">
-                <Button variant="outline" size="sm" className="rounded-full">
-                  Ver Todos
-                </Button>
-              </Link>
             </div>
           )}
         </div>
@@ -64,7 +64,7 @@ export default async function HomePage() {
             Destaques
           </h2>
           <Link href="/products" className="text-blue-600 hover:underline text-sm font-medium">
-            Ver tudo &rarr;
+            Ver todos &rarr;
           </Link>
         </div>
 
@@ -75,7 +75,7 @@ export default async function HomePage() {
         ) : products.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-500">
             <PackageSearch className="w-16 h-16 mb-4 opacity-50" />
-            <p className="text-lg">Nenhum produto em destaque.</p>
+            <p className="text-lg">Nenhum destaque no momento.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">

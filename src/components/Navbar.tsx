@@ -55,8 +55,7 @@ export function Navbar() {
                 name="q"
                 type="text"
                 placeholder="Buscar produtos..."
-                className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-zinc-800 border-zinc-700 text-white"
-              />
+                className="w-full pl-10 pr-4 py-2 rounded-full border border-input bg-secondary text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder:text-muted-foreground"              />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             </form>
           </div>

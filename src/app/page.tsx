@@ -47,7 +47,7 @@ export default async function HomePage() {
               </Link>
               {categories.map((cat) => (
                 <Link key={cat.id} href={`/products?category_id=${cat.id}`}>
-                  <Button variant="outline" size="sm" className="rounded-full bg-transparent hover:bg-gray-100 hover:bg-zinc-800">
+                  <Button variant="outline" size="sm" className="rounded-full bg-transparent hover:bg-accent hover:text-accent-foreground" >
                     {cat.name}
                   </Button>
                 </Link>

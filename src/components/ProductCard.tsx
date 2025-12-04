@@ -18,10 +18,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const isOutOfStock = product.stock <= 0;
 
   return (
-    <div className="group relative flex flex-col justify-between overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
-
+    <div className="group relative flex flex-col justify-between overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm transition-all hover:shadow-md">
       {/* Imagem com Link */}
-      <Link href={`/products/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-gray-100">
+      <Link href={`/products/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-secondary">
         <img
           src={mainImage}
           alt={product.name}
@@ -42,19 +41,20 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-2">
           <Link href={`/products/${product.id}`}>
-            <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 dark:text-gray-100 line-clamp-1">
+            <h3 className="text-lg font-semibold text-foreground hover:text-primary line-clamp-1">
               {product.name}
             </h3>
           </Link>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+          <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+            {product.description}
             {product.description}
           </p>
         </div>
 
         <div className="mt-auto flex items-center justify-between pt-4">
           <div className="flex flex-col">
-            <span className="text-xs text-gray-500 dark:text-gray-400">Preço</span>
-            <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
+            <span className="text-xs text-muted-foreground">Preço</span>
+            <span className="text-xl font-bold text-primary">
               {formattedPrice}
             </span>
           </div>

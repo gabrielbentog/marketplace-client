@@ -1,102 +1,69 @@
 @import "tailwindcss";
 
+/* 👇 O PULO DO GATO:
+  Isso redefine a lógica de 'dark mode' do Tailwind.
+  Ao mudar para classe (.dark), ele para de olhar o Sistema Operacional.
+  Como não vamos adicionar essa classe no HTML, o modo escuro morre.
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  /* Modo Claro */
+  /* Força scrollbars e inputs nativos do navegador a serem claros */
+  color-scheme: light;
+
+  /* --- PALETA SLATE & INDIGO (Profissional) --- */
   --background: #ffffff;
-  --foreground: #09090b; /* Texto quase preto */
+  --foreground: #0f172a; /* Slate 900 */
 
   --card: #ffffff;
-  --card-foreground: #09090b;
+  --card-foreground: #0f172a;
 
   --popover: #ffffff;
-  --popover-foreground: #09090b;
+  --popover-foreground: #0f172a;
 
-  --primary: #2563eb; /* Azul vibrante */
+  --primary: #4f46e5; /* Indigo 600 - A cor da marca */
   --primary-foreground: #ffffff;
 
-  --secondary: #f4f4f5; /* Cinza bem claro */
-  --secondary-foreground: #18181b;
+  --secondary: #f1f5f9; /* Slate 100 - Fundos secundários */
+  --secondary-foreground: #1e293b; /* Slate 800 */
 
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b; /* Slate 500 - Textos de apoio */
 
-  --accent: #f4f4f5;
-  --accent-foreground: #18181b;
+  --accent: #f8fafc; /* Slate 50 - Hovers */
+  --accent-foreground: #0f172a;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #2563eb; /* Anel de foco azul */
+  --border: #e2e8f0; /* Slate 200 - Bordas sutis */
+  --input: #e2e8f0;
+  --ring: #4f46e5; /* Indigo 600 - Foco */
 
   --radius: 0.5rem;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Modo Escuro */
-    --background: #09090b; /* Preto suave */
-    --foreground: #fafafa; /* Branco suave */
-
-    --card: #09090b;
-    --card-foreground: #fafafa;
-
-    --popover: #09090b;
-    --popover-foreground: #fafafa;
-
-    --primary: #3b82f6; /* Azul mais claro para dark mode */
-    --primary-foreground: #ffffff;
-
-    --secondary: #27272a; /* Cinza escuro */
-    --secondary-foreground: #fafafa;
-
-    --muted: #27272a;
-    --muted-foreground: #a1a1aa;
-
-    --accent: #27272a;
-    --accent-foreground: #fafafa;
-
-    --destructive: #7f1d1d;
-    --destructive-foreground: #fafafa;
-
-    --border: #27272a;
-    --input: #27272a;
-    --ring: #1d4ed8;
-  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-
   --radius-radius: var(--radius);
-
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -106,10 +73,8 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Remove estilo padrão de scrollbar se desejar */
 * {
   border-color: var(--border);
 }

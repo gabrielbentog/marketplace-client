@@ -12,49 +12,43 @@ import { Badge } from "@/components/ui/Badge";
 import { Edit, Trash2, Plus, PackageSearch, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function MyProductsPage() {
   // 1. Pegamos o isLoading do contexto e renomeamos para authLoading
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-  const router = useRouter();
-
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isProductsLoading, setIsProductsLoading] = useState(true); // Renomeei para evitar confusão
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  // 2. Proteção de Rota Ajustada
-  useEffect(() => {
-    if (!authLoading && user && user.role !== "seller") {
-      router.push("/"); // Proteção de Role continua no cliente por enquanto
+  const { data: products = [], isLoading: isProductsLoading } = useQuery({
+    queryKey: ['my-products', user?.id], // Chave única do cache
+    queryFn: async () => {
+      const response = await ProductService.getAll({ page: 1, per_page: 50 });
+      const allItems = response.data || [];
+      // Filtro no cliente (idealmente a API filtraria por seller_id)
+      return user?.id ? allItems.filter(p => p.user?.id === user.id) : [];
+    },
+    enabled: !!user?.id && isAuthenticated, // Só roda se tiver usuário
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => ProductService.delete(id),
+    onSuccess: () => {
+      toast.success("Anúncio excluído com sucesso.");
+      // Atualiza a lista automaticamente sem precisar de refresh manual
+      queryClient.invalidateQueries({ queryKey: ['my-products'] });
+    },
+    onError: () => {
+      toast.error("Erro ao excluir.");
     }
-  }, [user, authLoading, router]);
+  });
 
-  // Carregar Produtos
-  useEffect(() => {
-    const fetchMyProducts = async () => {
-      try {
-        const response = await ProductService.getAll({
-          page: 1,
-          per_page: 50,
-        });
-
-        setProducts(response.data || []);
-      } catch (error) {
-        console.error("Erro ao carregar produtos", error);
-        toast.error("Não foi possível carregar seus produtos.");
-      } finally {
-        setIsProductsLoading(false);
-      }
-    };
-
-    // Só busca se a autenticação já terminou e o usuário for seller
-    if (!authLoading && isAuthenticated && user?.role === "seller") {
-      fetchMyProducts();
-    }
-  }, [isAuthenticated, user, authLoading]);
-
+  const handleDelete = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este anúncio?")) return;
+    deleteMutation.mutate(id);
+  };
   // 3. Loading State Global (Auth ou Produtos)
-  if (authLoading || (isAuthenticated && user?.role === "seller" && isProductsLoading)) {
+  if (authLoading || isProductsLoading) {
     return (
       <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -91,22 +85,6 @@ export default function MyProductsPage() {
   // Se passou do loading e não está autenticado (vai redirecionar via useEffect),
   // retornamos null para não piscar a tela vazia
   if (!isAuthenticated || user?.role !== "seller") return null;
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este anúncio?")) return;
-
-    setIsDeleting(id);
-    try {
-      await ProductService.delete(id);
-      setProducts(prev => prev.filter(p => p.id !== id));
-      toast.success("Anúncio excluído com sucesso.");
-    } catch (error) {
-      console.error(error);
-      toast.error("Erro ao excluir. Tente novamente.");
-    } finally {
-      setIsDeleting(null);
-    }
-  };
 
   return (
     <div className="bg-gray-50 dark:bg-black min-h-screen py-10">

@@ -1,50 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { OrderService } from "@/services/orders";
 import { formatPrice } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Package, Calendar, ChevronRight } from "lucide-react";
-import { Order } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { useQuery } from "@tanstack/react-query";
 
 export default function MyOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
-  // Proteção de rota
+  // Proteção de rota (mantida para segurança)
   useEffect(() => {
-    if (!isAuthenticated) {
-      // Pequeno delay para garantir que o auth carregou
-      const timeout = setTimeout(() => {
-         if (!isAuthenticated) router.push("/login");
-      }, 500);
-      return () => clearTimeout(timeout);
+    if (!authLoading && !isAuthenticated) {
+         router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, authLoading, router]);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await OrderService.getAll({ page: 1, per_page: 20 });
-        setOrders(response.data || []);
-      } catch (error) {
-        console.error("Erro ao buscar pedidos:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (isAuthenticated) {
-      fetchOrders();
-    }
-  }, [isAuthenticated]);
+  // 2. QUERY: Busca automática
+  const { data: orders = [], isLoading: isOrdersLoading } = useQuery({
+    queryKey: ['my-orders'],
+    queryFn: async () => {
+      const response = await OrderService.getAll({ page: 1, per_page: 20 });
+      return response.data || [];
+    },
+    enabled: isAuthenticated, // Só busca se logado
+  });
 
   const statusVariant: Record<string, "default" | "success" | "warning" | "error"> = {
     pending: "warning",
@@ -54,7 +41,8 @@ export default function MyOrdersPage() {
     cancelled: "error",
   };
 
-if (isLoading) {
+  // 3. Loading State com Skeleton
+  if (authLoading || isOrdersLoading) {
     return (
       <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">

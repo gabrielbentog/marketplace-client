@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -8,46 +8,29 @@ import { OrderService } from "@/services/orders";
 import { formatPrice } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { ArrowLeft, MapPin, CreditCard } from "lucide-react";
-import { Order, OrderItem } from "@/types";
+import { OrderItem } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
-import { Skeleton } from "@/components/ui/Skeleton"; // <--- Importe Skeleton
+import { Skeleton } from "@/components/ui/Skeleton";
+import { useQuery } from "@tanstack/react-query";
 
 export default function OrderDetailPage() {
   const params = useParams();
   const id = params.id as string;
-
-  const [order, setOrder] = useState<Order | null>(null);
-  const [isOrderLoading, setIsOrderLoading] = useState(true); // Renomeei para clareza
-  // CORREÇÃO: Pega authLoading
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
-  // CORREÇÃO: Só redireciona se auth carregou E não tá logado
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
         router.push("/login");
     }
   }, [isAuthenticated, authLoading, router]);
 
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const data = await OrderService.getById(id);
-        setOrder(data);
-      } catch (error) {
-        console.error("Erro ao buscar detalhes:", error);
-      } finally {
-        setIsOrderLoading(false);
-      }
-    };
+  const { data: order, isLoading: isOrderLoading, isError } = useQuery({
+    queryKey: ['order-details', id],
+    queryFn: () => OrderService.getById(id),
+    enabled: isAuthenticated && !!id,
+  });
 
-    // Só busca se estiver logado e o ID existir
-    if (isAuthenticated && id) {
-      fetchOrder();
-    }
-  }, [id, isAuthenticated]);
-
-  // CORREÇÃO: Loading unificado (Esqueleto)
   if (authLoading || isOrderLoading) {
     return (
       <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
@@ -79,11 +62,11 @@ export default function OrderDetailPage() {
     );
   }
 
-  if (!order) {
+  if (isError || !order) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <p className="text-lg text-gray-500">Pedido não encontrado.</p>
-        <Link href="/orders" className="text-blue-600 hover:underline mt-2">Voltar</Link>
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-50 dark:bg-black">
+        <p className="text-lg text-gray-500 mb-2">Pedido não encontrado.</p>
+        <Link href="/orders" className="text-blue-600 hover:underline">Voltar</Link>
       </div>
     );
   }

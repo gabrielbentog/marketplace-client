@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { Toaster } from "sonner";
 import { CartProvider } from "@/contexts/CartContext";
 import { Footer } from "@/components/Footer"; // <--- Importação do Footer adicionada
+import QueryProvider from "@/providers/QueryProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,21 +43,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-black`}>
-        <AuthProvider>
-          <CartProvider>
-            {/* Wrapper Flex para empurrar o footer para baixo */}
-            <div className="flex flex-col min-h-screen">
-              <Navbar />
-              <main className="flex-grow">
-                {children}
-              </main>
-              <Footer />
-            </div>
+        <QueryProvider>
+          <AuthProvider>
+            <CartProvider>
+              {/* Wrapper Flex para empurrar o footer para baixo */}
+              <div className="flex flex-col min-h-screen">
+                <Navbar />
+                <main className="flex-grow">
+                  {children}
+                </main>
+                <Footer />
+              </div>
 
-            {/* Componente Toaster adicionado para exibir os alertas */}
-            <Toaster position="top-right" richColors />
-          </CartProvider>
-        </AuthProvider>
+              {/* Componente Toaster adicionado para exibir os alertas */}
+              <Toaster position="top-right" richColors />
+            </CartProvider>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

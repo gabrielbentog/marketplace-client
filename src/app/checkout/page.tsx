@@ -9,13 +9,13 @@ import { CheckoutService } from "@/services/checkout";
 import { Address } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { AddressForm } from "@/components/AddressForm";
-import { MapPin, CreditCard, CheckCircle, Plus, Loader2 } from "lucide-react";
+import { MapPin, CreditCard, CheckCircle, Plus } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function CheckoutPage() {
-  // ... (Todo o código anterior de hooks e useEffects mantém igual) ...
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { cart, cartTotal, clearCart, isLoading: isCartLoading } = useCart();
@@ -76,7 +76,7 @@ export default function CheckoutPage() {
   if (authLoading || isCartLoading || (isAuthenticated && isLoadingAddresses)) {
     return (
       <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Skeleton className="h-10 w-64 mb-8" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2 space-y-8">
@@ -117,7 +117,8 @@ export default function CheckoutPage() {
 
   return (
     <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <Breadcrumbs />
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Finalizar Compra</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

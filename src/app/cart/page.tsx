@@ -7,6 +7,7 @@ import { formatPrice, getImageUrl } from "@/lib/utils";
 import { Trash2, Minus, Plus, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function CartPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -76,6 +77,7 @@ export default function CartPage() {
   return (
     <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <Breadcrumbs />
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Meu Carrinho</h1>
 
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start xl:gap-x-16">

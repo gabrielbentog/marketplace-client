@@ -12,6 +12,7 @@ import { OrderItem } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useQuery } from "@tanstack/react-query";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function OrderDetailPage() {
   const params = useParams();
@@ -88,9 +89,10 @@ export default function OrderDetailPage() {
   };
 
   return (
-    // ... (O JSX de retorno do conteúdo real permanece idêntico)
     <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+
+        <Breadcrumbs lastItemLabel={`Pedido #${order.id.slice(0, 8)}`} />
 
         <Link href="/orders" className="flex items-center text-sm text-gray-500 hover:text-gray-900 mb-6 dark:text-gray-400 dark:hover:text-white">
           <ArrowLeft className="w-4 h-4 mr-1" /> Voltar para meus pedidos

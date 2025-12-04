@@ -7,6 +7,7 @@ import { ProductImageGallery } from "@/components/ProductImageGallery"; // <--- 
 import { Badge } from "@/components/ui/Badge";
 import { ChevronLeft, Package, Store } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
@@ -57,15 +58,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Breadcrumb / Voltar */}
-        <div className="mb-6">
-          <Link
-            href="/"
-            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4 mr-1" />
-            Voltar para produtos
-          </Link>
-        </div>
+        <Breadcrumbs lastItemLabel={product.name} />
 
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
 

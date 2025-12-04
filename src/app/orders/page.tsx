@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useQuery } from "@tanstack/react-query";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function MyOrdersPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -82,6 +83,9 @@ export default function MyOrdersPage() {
   return (
     <div className="bg-gray-50 dark:bg-black min-h-screen py-10">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+
+        <Breadcrumbs />
+
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Meus Pedidos</h1>
 
         {orders.length === 0 ? (

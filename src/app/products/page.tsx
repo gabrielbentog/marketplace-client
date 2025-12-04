@@ -5,6 +5,7 @@ import { PackageSearch, ChevronLeft, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
 import { Product } from "@/types";
 import { CategoryService } from "@/services/categories";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 interface ProductsPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -46,12 +47,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     console.error("Erro ao carregar produtos:", error);
   }
 
-  // Removemos a Server Action de busca pois agora usamos a Navbar
-
   return (
     <div className="bg-gray-50 dark:bg-black min-h-screen py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
+        <Breadcrumbs />
         {/* Cabeçalho Limpo */}
         <div className="flex flex-col gap-4 mb-8">
           <div className="flex items-center justify-between">
